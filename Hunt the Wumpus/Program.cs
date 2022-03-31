@@ -43,6 +43,7 @@
     }
     
     static void PrintMaze(string[,] maze) {
+        Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         for (int x = 0; x < 8; x++)
         {
             for (int y = 0; y < 8; y++)
@@ -56,20 +57,93 @@
     static void CheckForEvidence(string dir, string[,] userMaze, string[,] maze, int[] userPos)
     {
         if (maze[userPos[0], userPos[1]] == "!") {
+            SetLastPosition(dir, userMaze, maze, userPos);
             userMaze[userPos[0], userPos[1]] = "^";
         } else if (maze[userPos[0], userPos[1]] == "&") {
             Console.WriteLine("You encountered the Wumpus!");
             Console.WriteLine("Game Over.");
         } else {
+            SetLastPosition(dir, userMaze, maze, userPos);
             userMaze[userPos[0], userPos[1]] = "*";
         }
-
-        SetLastPosition(userMaze, maze, userPos);
     }
 
-    static void SetLastPosition(string[,] userMaze, string[,] maze, int[] userPos)
+    static void SetLastPosition(string dir, string[,] userMaze, string[,] maze, int[] userPos)
     {
-        
+        switch (dir)
+        {
+            case "north":
+                if (maze[userPos[0] + 1, userPos[1]] == "!") userMaze[userPos[0] + 1, userPos[1]] = "!";
+                else userMaze[userPos[0] + 1, userPos[1]] = "0";
+                break;
+            case "south":
+                if (maze[userPos[0] - 1, userPos[1]] == "!") userMaze[userPos[0] - 1, userPos[1]] = "!";
+                else userMaze[userPos[0] - 1, userPos[1]] = "0";
+                break;
+            case "east":
+                if (maze[userPos[0], userPos[1] - 1] == "!") userMaze[userPos[0], userPos[1] - 1] = "!";
+                else userMaze[userPos[0], userPos[1] - 1] = "0";
+                break;
+            case "west":
+                if (maze[userPos[0], userPos[1] + 1] == "!") userMaze[userPos[0], userPos[1] + 1] = "!";
+                else userMaze[userPos[0], userPos[1] + 1] = "0";
+                break;
+        }
+    }
+
+    static void CheckForArrow(string arrowDir, int[] userPos, string[,] maze)
+    {
+        switch (arrowDir)
+        {
+            case "north": case "n":
+                for (int i = 0; i < 8; i++)
+                {
+                    if (maze[i, userPos[1]] == "&" && i < userPos[0]) {
+                        PrintMaze(maze);
+                        Console.WriteLine("Congratulations! You hit the Wumpus!");
+                    } else {
+                        PrintMaze(maze);
+                        Console.WriteLine("You lost ...");
+                    }
+                }
+                break;
+            case "south": case "s":
+                for (int i = 0; i < 8; i++)
+                {
+                    if (maze[i, userPos[1]] == "&" && i > userPos[0]) {
+                        PrintMaze(maze);
+                        Console.WriteLine("Congratulations! You hit the Wumpus!");
+                    } else {
+                        PrintMaze(maze);
+                        Console.WriteLine("You lost ...");
+                    }
+                }
+                break;
+            case "east": case "e":
+                for (int i = 0; i < 8; i++)
+                {
+                    if (maze[userPos[0], i] == "&" && i < userPos[1]) {
+                        PrintMaze(maze);
+                        Console.WriteLine("Congratulations! You hit the Wumpus!");
+                    } else {
+                        PrintMaze(maze);
+                        Console.WriteLine("You lost ...");
+                    }
+                }
+                break;
+            case "west": case "w":
+                for (int i = 0; i < 8; i++)
+                {
+                    if (maze[userPos[0], i] == "&" && i > userPos[1]) {
+                        PrintMaze(maze);
+                        Console.WriteLine("Congratulations! You hit the Wumpus!");
+                    } else {
+                        PrintMaze(maze);
+                        Console.WriteLine("You lost ...");
+                    }
+                }
+                break;
+        }
     }
     
     static void Main()
@@ -92,22 +166,26 @@
             switch (dir)
             {
                 case "n": case "north":
-                    userPos[1]--;
+                    userPos[0]--;
                     CheckForEvidence("north", userMaze, maze, userPos);
                     break;
                 case "s": case "south":
-                    userPos[1]++;
+                    userPos[0]++;
                     CheckForEvidence("south", userMaze, maze, userPos);
                     break;
                 case "e": case "east":
-                    userPos[0]++;
+                    userPos[1]++;
                     CheckForEvidence("east", userMaze, maze, userPos);
                     break;
                 case "w": case "west":
-                    userPos[0]--;
+                    userPos[1]--;
                     CheckForEvidence("west", userMaze, maze, userPos);
                     break;
                 case "arrow": case "shoot":
+                    Console.WriteLine("Which direction do you want to shoot the arrow?");
+                    string arrowDir = Console.ReadLine();
+                    CheckForArrow(arrowDir, userPos, maze);
+                    gameOver = true;
                     break;
                 default:
                     Console.WriteLine("That's not a direction!");
