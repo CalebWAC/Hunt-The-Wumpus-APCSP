@@ -93,6 +93,8 @@
 
     static void CheckForArrow(string arrowDir, int[] userPos, string[,] maze)
     {
+        bool won = false;
+        
         switch (arrowDir)
         {
             case "north": case "n":
@@ -101,9 +103,7 @@
                     if (maze[i, userPos[1]] == "&" && i < userPos[0]) {
                         PrintMaze(maze);
                         Console.WriteLine("Congratulations! You hit the Wumpus!");
-                    } else {
-                        PrintMaze(maze);
-                        Console.WriteLine("You lost ...");
+                        won = true;
                     }
                 }
                 break;
@@ -113,36 +113,36 @@
                     if (maze[i, userPos[1]] == "&" && i > userPos[0]) {
                         PrintMaze(maze);
                         Console.WriteLine("Congratulations! You hit the Wumpus!");
-                    } else {
-                        PrintMaze(maze);
-                        Console.WriteLine("You lost ...");
-                    }
+                        won = true;
+                    } 
                 }
                 break;
             case "east": case "e":
                 for (int i = 0; i < 8; i++)
                 {
-                    if (maze[userPos[0], i] == "&" && i < userPos[1]) {
+                    if (maze[userPos[0], i] == "&" && i > userPos[1]) {
                         PrintMaze(maze);
                         Console.WriteLine("Congratulations! You hit the Wumpus!");
-                    } else {
-                        PrintMaze(maze);
-                        Console.WriteLine("You lost ...");
-                    }
+                        won = true;
+                    } 
                 }
                 break;
             case "west": case "w":
                 for (int i = 0; i < 8; i++)
                 {
-                    if (maze[userPos[0], i] == "&" && i > userPos[1]) {
+                    if (maze[userPos[0], i] == "&" && i < userPos[1]) {
                         PrintMaze(maze);
                         Console.WriteLine("Congratulations! You hit the Wumpus!");
-                    } else {
-                        PrintMaze(maze);
-                        Console.WriteLine("You lost ...");
-                    }
+                        won = true;
+                    } 
                 }
                 break;
+        }
+
+        if (!won)
+        {
+            PrintMaze(maze);
+            Console.WriteLine("You lost ...");
         }
     }
     
