@@ -1,9 +1,17 @@
-﻿class Program
+﻿using System;
+
+class Program
 {
+    // Condition for if the game is won
+    static bool won = false;
+    
+    /** Creates and fills a maze with "?".
+    Also adds the Wumpus if it is not the user maze */
     static string[,] SetUpMaze(bool isReal)
     {
         string[,] maze = new string[8, 8];
         
+        // For each x position and y position, add a ? to the maze
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
@@ -12,28 +20,40 @@
             }
         }
         
+        // Adds the Wumpus to the maze if the maze is the real one and not the user one
         if (isReal) maze = AddTheWumpus(maze);
         return maze;
     }
     
+    /** Inserts the Wumpus "&" at a random location in the maze */
     static string[,] AddTheWumpus(string[,] maze) {
+        // Randomizes the position of the Wumpus
         Random r = new Random();
         int locX = r.Next(8);
         int locY = r.Next(8);
-        maze[locX, locY] = "&";
         
+        // Adds the Wumpus and the evidence to the map
+        maze[locX, locY] = "&";
         maze = CreateEvidence(maze, locX, locY);
+        
         return maze; 
     }
     
+    /** Adds a "!" to each space surrounding the wumpus*/
     static string[,] CreateEvidence(string[,] maze, int locX, int locY) {
+        // Loops over each x and y position pair
         for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) {
+            for (int y = 0; y < 8; y++) { 
                 if (Math.Abs(x - locX) == 1 && Math.Abs(y - locY) == 1) {
+                    // Checks if the current x and y position are within 1 from the Wumpus
                     maze[x, y] = "!";
                 } else if (Math.Abs(x - locX) == 0 && Math.Abs(y - locY) == 1) {
+                    // Checks if the current x position is the same as the Wumpus,
+                    // but the y position is within 1 space
                     maze[x, y] = "!";
                 } else if (Math.Abs(x - locX) == 1 && Math.Abs(y - locY) == 0) {
+                    // Checks if the current x position is within 1 space from the Wumpus
+                    // and if the y position is the same
                     maze[x, y] = "!";
                 }
             }
@@ -42,29 +62,33 @@
         return maze;
     }
     
+    /** Formats and prints the maze to the console */
     static void PrintMaze(string[,] maze) {
+        // Adds new lines
         Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        
+        // Loops over position in the maze using x and y coordinates
         for (int x = 0; x < 8; x++)
         {
             for (int y = 0; y < 8; y++)
             {
-                switch (maze[x, y])
+                switch (maze[x, y]) // Checks the current character at (x, y)
                 {
-                    case "*": case "^":
-                        Console.ForegroundColor = ConsoleColor.DarkBlue;
-                        Console.BackgroundColor = ConsoleColor.Black;
+                    case "*": case "^": // Turns the text blue if it represents the player
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.BackgroundColor = ConsoleColor.White;
                         break;
-                    case "0": 
-                        Console.BackgroundColor = ConsoleColor.Green;
+                    case "0": // Turns the text dark yellow if it represents a travelled location
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
                         Console.ForegroundColor = ConsoleColor.DarkYellow; break;
-                    case "!":
-                        Console.BackgroundColor = ConsoleColor.Green;
+                    case "!": // Turns the text red if it represents one space from the Wumpus
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
                         Console.ForegroundColor = ConsoleColor.Red; break;
-                    case "&":
-                        Console.BackgroundColor = ConsoleColor.Green;
+                    case "&": // Turns the text magenta if it represents the Wumpus
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
                         Console.ForegroundColor = ConsoleColor.Magenta; break;
-                    case "?":
-                        Console.BackgroundColor = ConsoleColor.Green;
+                    case "?": // Turns the text white if it represents an untravelled location
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
                         Console.ForegroundColor = ConsoleColor.White; break;
                 }
                 
@@ -72,55 +96,65 @@
             }
             Console.WriteLine();
             
-            Console.BackgroundColor = ConsoleColor.Green;
+            // Resets the console color
+            Console.BackgroundColor = ConsoleColor.DarkGreen;
             Console.ForegroundColor = ConsoleColor.White;
         }
     }
 
+    /** Checks to see if the player is at evidence or the Wumpus */
     static void CheckForEvidence(string dir, string[,] userMaze, string[,] maze, int[] userPos)
     {
         if (maze[userPos[0], userPos[1]] == "!") {
+            // Changes the player's character to ^ if the current location has evidence (!)
             SetLastPosition(dir, userMaze, maze, userPos);
             userMaze[userPos[0], userPos[1]] = "^";
         } else if (maze[userPos[0], userPos[1]] == "&") {
+            // Ends the game if the player is on the same spot as the Wumpus
+            PrintMaze(maze);
             Console.WriteLine("You encountered the Wumpus!");
             Console.WriteLine("Game Over.");
+            Environment.Exit(1);
         } else {
+            // If the space is normal, change the user's last position
             SetLastPosition(dir, userMaze, maze, userPos);
             userMaze[userPos[0], userPos[1]] = "*";
         }
     }
 
+    /** Changes the character at the position where the user was previously at */
     static void SetLastPosition(string dir, string[,] userMaze, string[,] maze, int[] userPos)
     {
+        // Checks for which direction the user came from
         switch (dir)
         {
-            case "north":
+            case "north": // Checks if the previous location in maze was "!", otherwise sets it to "0"
                 if (maze[userPos[0] + 1, userPos[1]] == "!") userMaze[userPos[0] + 1, userPos[1]] = "!";
                 else userMaze[userPos[0] + 1, userPos[1]] = "0";
                 break;
-            case "south":
+            case "south": // Checks if the previous location in maze was "!", otherwise sets it to "0"
                 if (maze[userPos[0] - 1, userPos[1]] == "!") userMaze[userPos[0] - 1, userPos[1]] = "!";
                 else userMaze[userPos[0] - 1, userPos[1]] = "0";
                 break;
-            case "east":
+            case "east": // Checks if the previous location in maze was "!", otherwise sets it to "0"
                 if (maze[userPos[0], userPos[1] - 1] == "!") userMaze[userPos[0], userPos[1] - 1] = "!";
                 else userMaze[userPos[0], userPos[1] - 1] = "0";
                 break;
-            case "west":
+            case "west": // Checks if the previous location in maze was "!", otherwise sets it to "0"
                 if (maze[userPos[0], userPos[1] + 1] == "!") userMaze[userPos[0], userPos[1] + 1] = "!";
                 else userMaze[userPos[0], userPos[1] + 1] = "0";
                 break;
         }
     }
 
+    /** Checks if the direction and position the user shot the arrow hits the Wumpus */
     static void CheckForArrow(string arrowDir, int[] userPos, string[,] maze)
     {
-        bool won = false;
-        
-        switch (arrowDir)
+        // Checks which direction the user shot the arrow
+        switch (arrowDir) 
         {
-            case "north": case "n":
+            case "north": case "n": 
+                // If the Wumpus is at the same y position and in line of the arrow, the user wins
                 for (int i = 0; i < 8; i++)
                 {
                     if (maze[i, userPos[1]] == "&" && i < userPos[0]) {
@@ -131,6 +165,7 @@
                 }
                 break;
             case "south": case "s":
+                // If the Wumpus is at the same y position and in line of the arrow, the user wins
                 for (int i = 0; i < 8; i++)
                 {
                     if (maze[i, userPos[1]] == "&" && i > userPos[0]) {
@@ -141,6 +176,7 @@
                 }
                 break;
             case "east": case "e":
+                // If the Wumpus is at the same x position and in line of the arrow, the user wins
                 for (int i = 0; i < 8; i++)
                 {
                     if (maze[userPos[0], i] == "&" && i > userPos[1]) {
@@ -151,6 +187,7 @@
                 }
                 break;
             case "west": case "w":
+                // If the Wumpus is at the same y position and in line of the arrow, the user wins
                 for (int i = 0; i < 8; i++)
                 {
                     if (maze[userPos[0], i] == "&" && i < userPos[1]) {
@@ -162,6 +199,7 @@
                 break;
         }
 
+        // If the arrow missed, the correct location and "You lost ..." are outputted
         if (!won)
         {
             PrintMaze(maze);
@@ -171,22 +209,25 @@
     
     static void Main()
     {
-        Console.BackgroundColor = ConsoleColor.Green;
+        // Sets up the real maze, sets won to false, and changes the background color
+        Console.BackgroundColor = ConsoleColor.DarkGreen;
         string[,] maze = SetUpMaze(true);
-        bool gameOver = false;
+        bool won = false;
 
-
+        // Sets up the maze that the user sees and the user's positiion
         string[,] userMaze = SetUpMaze(false);
         int[] userPos = {3, 7};
         userMaze[userPos[0], userPos[1]] = "*";
         
         
-        while (!gameOver)
+        while (!won)
         {
+            // Asks the user where they want to go next
             PrintMaze(userMaze);
             Console.Write("Where would you like to go?");
             string dir = Console.ReadLine();
 
+            // Checks which direction the user inputted, then changes the user's position
             switch (dir)
             {
                 case "n": case "north":
@@ -206,12 +247,13 @@
                     CheckForEvidence("west", userMaze, maze, userPos);
                     break;
                 case "arrow": case "shoot":
+                    // Shoots the arrow based on the user's direction and ends the game
                     Console.WriteLine("Which direction do you want to shoot the arrow?");
                     string arrowDir = Console.ReadLine();
                     CheckForArrow(arrowDir, userPos, maze);
-                    gameOver = true;
+                    won = true;
                     break;
-                default:
+                default: // Runs if the user did not input a valid direction or command
                     Console.WriteLine("That's not a direction!");
                     break;
             }
