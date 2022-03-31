@@ -48,9 +48,32 @@
         {
             for (int y = 0; y < 8; y++)
             {
-                Console.Write(maze[x,y] + " ");
+                switch (maze[x, y])
+                {
+                    case "*": case "^":
+                        Console.ForegroundColor = ConsoleColor.DarkBlue;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                        break;
+                    case "0": 
+                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.ForegroundColor = ConsoleColor.DarkYellow; break;
+                    case "!":
+                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.ForegroundColor = ConsoleColor.Red; break;
+                    case "&":
+                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.ForegroundColor = ConsoleColor.Magenta; break;
+                    case "?":
+                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.ForegroundColor = ConsoleColor.White; break;
+                }
+                
+                Console.Write(maze[x,y] + " "); 
             }
             Console.WriteLine();
+            
+            Console.BackgroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 
@@ -148,6 +171,7 @@
     
     static void Main()
     {
+        Console.BackgroundColor = ConsoleColor.Green;
         string[,] maze = SetUpMaze(true);
         bool gameOver = false;
 
