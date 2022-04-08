@@ -1,4 +1,6 @@
-﻿class Program
+﻿using System;
+
+class Program
 {
     // Condition for if the game is won
     static bool won = false;
@@ -63,12 +65,13 @@
 
     static string[,] AddObstacles(string[,] maze, int wX, int wY)
     {
+        var r = new Random();
         for (int i = 0; i < 5; i++)
         {
-            var r = new Random();
             int locX = r.Next(8);
             int locY = r.Next(8);
-            if (locX != wX && locY != wY) maze[locX, locY] = "Ø";
+            if (locX != wX && locY != wY) maze[locX, locY] = "@";
+            Console.WriteLine($"Obstacle at {locX}, {locY}");
         }
 
         return maze;
@@ -102,8 +105,8 @@
                     case "?": // Turns the text white if it represents an untravelled location
                         Console.BackgroundColor = ConsoleColor.DarkGreen;
                         Console.ForegroundColor = ConsoleColor.White; break;
-                    case "Ø": // Turns the text yellow if it represents an obstacle
-                        Console.BackgroundColor = ConsoleColor.Green;
+                    case "@": // Turns the text yellow if it represents an obstacle
+                        Console.BackgroundColor = ConsoleColor.DarkGreen;
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         break;
                 }
@@ -131,24 +134,24 @@
             Console.WriteLine("You encountered the Wumpus!");
             Console.WriteLine("Game Over.");
             Environment.Exit(1);
-        } else if (maze[userPos[0], userPos[1]] == "Ø") {
+        } else if (maze[userPos[0], userPos[1]] == "@") {
             switch (dir)
             {
                 case "north": 
                     userPos[0]++;
-                    userMaze[userPos[0] - 1, userPos[1]] = "Ø";
+                    userMaze[userPos[0] - 1, userPos[1]] = "@";
                     break;
                 case "south": 
                     userPos[0]--; 
-                    userMaze[userPos[0] + 1, userPos[1]] = "Ø";
+                    userMaze[userPos[0] + 1, userPos[1]] = "@";
                     break;
                 case "east": 
                     userPos[1]--; 
-                    userMaze[userPos[0], userPos[1] + 1] = "Ø";
+                    userMaze[userPos[0], userPos[1] + 1] = "@";
                     break;
                 case "west": 
                     userPos[1]++; 
-                    userMaze[userPos[0], userPos[1] - 1] = "Ø";
+                    userMaze[userPos[0], userPos[1] - 1] = "@";
                     break;
             }
         } else {
@@ -242,6 +245,8 @@
             Console.WriteLine("You lost ...");
         }
     }
+
+    private static Random r = new Random();
     
     static void Main()
     {
@@ -252,9 +257,9 @@
 
         // Sets up the maze that the user sees and the user's positiion
         string[,] userMaze = SetUpMaze(false);
-
-        var r = new Random();
-        int[] userPos = {r.Next(8), r.Next(8)};
+        
+        // int[] userPos = {r.Next(8), r.Next(8)};
+        int[] userPos = {3, 7};
         userMaze[userPos[0], userPos[1]] = "*";
         
         
