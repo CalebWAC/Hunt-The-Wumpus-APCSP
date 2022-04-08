@@ -56,7 +56,21 @@
                 }
             }
         }
-        
+
+        maze = AddObstacles(maze, locX, locY);
+        return maze;
+    }
+
+    static string[,] AddObstacles(string[,] maze, int wX, int wY)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            var r = new Random();
+            int locX = r.Next(8);
+            int locY = r.Next(8);
+            if (locX != wX && locY != wY) maze[locX, locY] = "Ø";
+        }
+
         return maze;
     }
     
@@ -88,6 +102,10 @@
                     case "?": // Turns the text white if it represents an untravelled location
                         Console.BackgroundColor = ConsoleColor.DarkGreen;
                         Console.ForegroundColor = ConsoleColor.White; break;
+                    case "Ø": // Turns the text yellow if it represents an obstacle
+                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        break;
                 }
                 
                 Console.Write(maze[x,y] + " "); 
@@ -113,6 +131,26 @@
             Console.WriteLine("You encountered the Wumpus!");
             Console.WriteLine("Game Over.");
             Environment.Exit(1);
+        } else if (maze[userPos[0], userPos[1]] == "Ø") {
+            switch (dir)
+            {
+                case "north": 
+                    userPos[0]++;
+                    userMaze[userPos[0] - 1, userPos[1]] = "Ø";
+                    break;
+                case "south": 
+                    userPos[0]--; 
+                    userMaze[userPos[0] + 1, userPos[1]] = "Ø";
+                    break;
+                case "east": 
+                    userPos[1]--; 
+                    userMaze[userPos[0], userPos[1] + 1] = "Ø";
+                    break;
+                case "west": 
+                    userPos[1]++; 
+                    userMaze[userPos[0], userPos[1] - 1] = "Ø";
+                    break;
+            }
         } else {
             // If the space is normal, change the user's last position
             SetLastPosition(dir, userMaze, maze, userPos);
@@ -214,7 +252,9 @@
 
         // Sets up the maze that the user sees and the user's positiion
         string[,] userMaze = SetUpMaze(false);
-        int[] userPos = {3, 7};
+
+        var r = new Random();
+        int[] userPos = {r.Next(8), r.Next(8)};
         userMaze[userPos[0], userPos[1]] = "*";
         
         
