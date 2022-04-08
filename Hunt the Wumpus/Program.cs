@@ -1,6 +1,4 @@
-﻿using System;
-
-class Program
+﻿class Program
 {
     // Condition for if the game is won
     static bool won = false;
